@@ -17,7 +17,7 @@ end
 
 local function Initialize( self )
 
-    self.l_nextdisconnect = CurTime() + rand( 60, 5000 ) -- The next time until we will disconnect
+    self.l_nextdisconnect = CurTime() + rand( 1, GetConVar( "lambdaplayers_cd_disconnecttime" ):GetInt() )  -- The next time until we will disconnect
 
 
     -- Very basic disconnecting stuff
