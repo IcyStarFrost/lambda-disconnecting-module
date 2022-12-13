@@ -9,6 +9,7 @@ local function Convars()
 
     CreateLambdaConvar( "lambdaplayers_cd_allowdisconnecting", 1, true, false, false, "If Lambda Players are allowed to disconnect", 0, 1, { type = "Bool", name = "Allow Disconnecting", category = "Misc" } )
     CreateLambdaConvar( "lambdaplayers_cd_disconnectmessage", "disconnected from the server", true, false, false, "The message to show when a Lambda Player disconnects", nil, nil, { type = "Text", name = "Disconnect Text", category = "Misc" } )
+    CreateLambdaConvar( "lambdaplayers_cd_disconnecttime", 5000, true, false, false, "The max amount of time it can take for a Lambda to disconnect", 15, 5000, { type = "Slider", decimals = 0, name = "Disconnect Time", category = "Misc" } )
 end
 
 -- This is all very simple. I don't really need to put a lot of documentation on this
@@ -68,7 +69,7 @@ local function Think( self )
             self:CancelMovement()
         end
         
-        self.l_nextdisconnect = CurTime() + rand( 60, 5000 ) 
+        self.l_nextdisconnect = CurTime() + rand( 1, GetConVar( "lambdaplayers_cd_disconnecttime" ):GetInt() ) 
     end
 
 end
