@@ -9,6 +9,9 @@ CreateLambdaConvar( "lambdaplayers_cd_allowdisconnecting", 1, true, false, false
 CreateLambdaConvar( "lambdaplayers_cd_disconnectmessage", "disconnected from the server", true, false, false, "The message to show when a Lambda Player disconnects", nil, nil, { type = "Text", name = "Disconnect Text", category = "Misc" } )
 CreateLambdaConvar( "lambdaplayers_cd_disconnecttime", 5000, true, false, false, "The max amount of time it can take for a Lambda to disconnect", 15, 5000, { type = "Slider", decimals = 0, name = "Disconnect Time", category = "Misc" } )
 
+local allowdisconnectline = CreateLambdaConvar( "lambdaplayers_cd_allowdisconnectlines", 1, true, false, false, "If Lambdas are allowed to type a message before they disconnect", 0, 1, { type = "Bool", name = "Allow Disconnect Lines", category = "Text Chat Options" } )
+local allowconnectline = CreateLambdaConvar( "lambdaplayers_cd_allowconnectlines", 1, true, false, false, "If Lambdas are allowed to type a message right after they first spawned", 0, 1, { type = "Bool", name = "Allow Connect Lines", category = "Text Chat Options" } )
+
 
 -- This is all very simple. I don't really need to put a lot of documentation on this
 
@@ -21,7 +24,7 @@ local function Initialize( self )
     -- Very basic disconnecting stuff
     function self:DisconnectState()
 
-        if random( 1, 100 ) <= self:GetTextChance() and !self:IsSpeaking() and self:CanType() then
+        if allowdisconnectline:GetBool() and random( 1, 100 ) <= self:GetTextChance() and !self:IsSpeaking() and self:CanType() then
             self:TypeMessage( self:GetTextLine( "disconnect" ) )
         end
         
@@ -34,6 +37,18 @@ local function Initialize( self )
         self:Disconnect()
     end
     
+    function self:ConnectedState()
+        if allowconnectline:GetBool() and random( 1, 100 ) <= self:GetTextChance() and !self:IsSpeaking() and self:CanType() then
+            self:TypeMessage( self:GetTextLine( "connect" ) )
+        end
+        
+        while self:GetIsTyping() do 
+            coroutine.yield() 
+        end
+
+        if self:GetState() == "ConnectedState" then self:SetState( "Idle" ) end
+    end
+
     -- Leave the game
     function self:Disconnect()
     
@@ -54,6 +69,8 @@ local function AIInitialize( self )
             LambdaPlayers_ChatAdd( ply, self:GetDisplayColor( ply ), self:GetLambdaName(), color_white,  " " .. GetConVar( "lambdaplayers_cd_connectmessage" ):GetString() )
         end
     end
+
+    self:SetState( "ConnectedState" )
 
 end
 
